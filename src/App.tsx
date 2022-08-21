@@ -1,26 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-function App() {
+import {Chat} from './components/Chat';
+import {Route, Routes} from 'react-router-dom';
+import {ChatOutlet} from './components/ChatOutlet';
+import {initChatsData, initContactsData} from './data/data';
+import {useEffect} from 'react';
+import {fetchChatContacts, fetchChats,} from './store/action-creators/chatActionCreator';
+import {useAppDispatch} from './store/hooks';
+
+const App = () => {
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (!localStorage.getItem("contacts") || !localStorage.getItem("chats")) {
+      localStorage.setItem("contacts", initContactsData);
+      localStorage.setItem("chats", initChatsData);
+    }
+    dispatch(fetchChatContacts());
+    dispatch(fetchChats());
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="wrapper">
+      <Routes>
+        <Route path="/" element={<ChatOutlet />}>
+          <Route path="/:chatId" element={<Chat />} />
+        </Route>
+      </Routes>
     </div>
   );
-}
+};
 
 export default App;
